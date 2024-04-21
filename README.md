@@ -1,2 +1,2 @@
 # Svelte New Tab
-A customizable New Tab site made with SvelteKit, TailwindCSS and TS
+A customizable New Tab site made with SvelteKit and TailwindCSS.
