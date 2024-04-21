@@ -5,6 +5,7 @@
 	import { dndzone, type DndEvent } from 'svelte-dnd-action';
 	import { fade } from 'svelte/transition';
 	import ItemEditModal from '../components/ItemEditModal.svelte';
+	import InfoModal from '../components/InfoModal.svelte';
 	const flipDurationMs = 150;
 
 	let columns: {
@@ -16,10 +17,18 @@
 	}[];
 	let isReady = false;
 	let dragDisabled = true;
-	$: enableDragging = !dragDisabled;
 
 	function toggleDragAbility() {
+		if (showModal) {
+			showModal = false;
+		}
 		dragDisabled = !dragDisabled;
+	}
+
+	let infoModalVisible = false;
+
+	function toggleInfo() {
+		infoModalVisible = !infoModalVisible;
 	}
 
 	let showModal = false;
@@ -288,12 +297,25 @@
 		<ItemEditModal item={currentItem} on:save={handleSave} on:cancel={handleCancel} />
 	{/if}
 
+	{#if infoModalVisible}
+		<InfoModal on:close={toggleInfo} />
+	{/if}
+
 	<div class="absolute bottom-0 right-0 items-center space-x-2 p-8">
 		<button
 			class={`hover:text-[#666666] active:scale-125 text-xl duration-100 ${dragDisabled ? 'text-[#181818]' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 			on:click={toggleDragAbility}
 		>
 			<i class="fa-solid fa-pencil p-5"></i>
+		</button>
+	</div>
+
+	<div class="absolute bottom-0 left-0 items-center space-x-2 p-8">
+		<button
+			class={`hover:text-[#666666] active:scale-125 text-xl duration-100 ${infoModalVisible ? 'text-[#fdf6e3] hover:text-[#fdf6e3]' : 'text-[#181818] '}`}
+			on:click={toggleInfo}
+		>
+			<i class="fa-solid fa-info p-5"></i>
 		</button>
 	</div>
 
@@ -339,13 +361,13 @@
 								</div>
 								{#if !dragDisabled}
 									<button
-										class="ml-auto p-1 rounded-full hover:bg-[#444]"
+										class="ml-auto rounded-full hover:bg-[#444]"
 										on:click|stopPropagation={(event) => {
 											openModal(item);
 											event.stopPropagation();
 										}}
 									>
-										<i class="fa-solid fa-gear text-[#fdf6e3]"></i>
+										<i class="fa-solid fa-gear text-[#fdf6e3] p-2"></i>
 									</button>
 								{/if}
 							</a>
