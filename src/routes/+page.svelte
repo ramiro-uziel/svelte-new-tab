@@ -303,7 +303,7 @@
 
 	<div class="absolute bottom-0 right-0 items-center space-x-2 p-8">
 		<button
-			class={`hover:text-[#666666] active:scale-125 text-xl duration-100 ${dragDisabled ? 'text-[#181818]' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
+			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${dragDisabled ? 'text-[#181818]' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 			on:click={toggleDragAbility}
 		>
 			<i class="fa-solid fa-pencil p-5"></i>
@@ -312,7 +312,7 @@
 
 	<div class="absolute bottom-0 left-0 items-center space-x-2 p-8">
 		<button
-			class={`hover:text-[#666666] active:scale-125 text-xl duration-100 ${infoModalVisible ? 'text-[#fdf6e3] hover:text-[#fdf6e3]' : 'text-[#181818] '}`}
+			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${infoModalVisible ? 'text-[#fdf6e3] hover:text-[#fdf6e3]' : 'text-[#181818] '}`}
 			on:click={toggleInfo}
 		>
 			<i class="fa-solid fa-info p-5"></i>
@@ -361,7 +361,7 @@
 								</div>
 								{#if !dragDisabled}
 									<button
-										class="ml-auto rounded-full hover:bg-[#444]"
+										class="ml-auto rounded-full hover:bg-[#444] bg-transparent"
 										on:click|stopPropagation={(event) => {
 											openModal(item);
 											event.stopPropagation();
