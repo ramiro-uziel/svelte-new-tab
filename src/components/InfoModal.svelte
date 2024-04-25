@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { clickoutside } from '@svelte-put/clickoutside';
+	import { browser } from '$app/environment';
 
 	let parent: Element;
 	let enabled = true;
@@ -10,6 +11,26 @@
 
 	function close() {
 		dispatch('close');
+	}
+
+	if (typeof window !== 'undefined') {
+		const handleKeydown = (event: KeyboardEvent) => {
+			if (event.key === 'Enter' || event.key === 'Escape') {
+				event.stopPropagation();
+
+				if (event.key === 'Enter') {
+					close();
+				} else if (event.key === 'Escape') {
+					close();
+				}
+			}
+		};
+
+		window.addEventListener('keydown', handleKeydown);
+
+		onDestroy(() => {
+			window.removeEventListener('keydown', handleKeydown);
+		});
 	}
 </script>
 
@@ -62,7 +83,7 @@
 				<div
 					class="text-white text-base outline-dashed outline-[#464646] outline-1 p-3 rounded bg-transparent"
 				>
-					0.1
+					0.2
 				</div>
 			</div>
 		</div>

@@ -3,18 +3,39 @@
 	import { fade } from 'svelte/transition';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { clickoutside } from '@svelte-put/clickoutside';
+	import ColorPicker, { ChromeVariant } from 'svelte-awesome-color-picker';
 
 	let parent: Element;
-	let enabled = true;
+	let isOpen: boolean;
 
-	export let item: { id: string; text: string; icon: string; url: string } = {
+	let isParentEnabled: boolean | undefined;
+	let isPickerDisabled: boolean | undefined;
+	let isEventActive: boolean = false;
+
+	$: isParentEnabled = !isOpen;
+	$: isParentEnabled = isEventActive;
+
+	export let item: {
+		id: any;
+		text: string;
+		icon: string;
+		color: string;
+		items: { id: string; text: string; icon: string; url: string }[];
+	} = {
 		id: '',
 		text: '',
 		icon: '',
-		url: ''
+		color: '',
+		items: []
 	};
 
-	let editedItem: { id: string; text: string; icon: string; url: string } = { ...item };
+	let editedItem: {
+		id: any;
+		text: string;
+		icon: string;
+		color: string;
+		items: { id: string; text: string; icon: string; url: string }[];
+	} = { ...item };
 
 	const dispatch = createEventDispatcher();
 
@@ -24,12 +45,6 @@
 
 	function cancel() {
 		dispatch('cancel');
-	}
-
-	function deleteItem() {
-		if (confirm('Are you sure you want to delete this item?')) {
-			dispatch('delete', item.id);
-		}
 	}
 
 	if (typeof window !== 'undefined') {
@@ -59,8 +74,8 @@
 	bind:this={parent}
 >
 	<div
-		class="relative backdrop-blur outline outline-[#353535] outline-1 rounded-2xl w-96 p-5"
-		use:clickoutside={{ enabled, limit: { parent } }}
+		class="relative backdrop-blur-lg outline outline-[#353535] outline-1 rounded-2xl w-96 p-5"
+		use:clickoutside={{ enabled: isParentEnabled }}
 		on:clickoutside={cancel}
 	>
 		<svg
@@ -91,32 +106,37 @@
 				/></label
 			>
 			<label class="flex flex-col gap-2"
-				>Icon
-				<div class="flex outline outline-[#838383] outline-1 p-2 rounded gap-3">
-					<div class="w-5 px-1">
-						<i class={editedItem.icon} />
-					</div>
-					<input
-						class="text-white text-base bg-transparent outline-none w-full"
-						type="text"
-						bind:value={editedItem.icon}
-					/>
-				</div>
-			</label>
-			<label class="flex flex-col gap-2"
-				>URL<input
+				>Icon<input
 					class="text-white text-base outline outline-[#838383] outline-1 p-2 rounded bg-transparent"
 					type="text"
-					bind:value={editedItem.url}
+					bind:value={editedItem.icon}
 				/></label
 			>
+			<div class="flex flex-col gap-2">
+				Color
+				<div
+					class="dark flex gap-2 outline outline-[#838383] outline-1 p-2 rounded color-picker-class"
+				>
+					<ColorPicker
+						bind:isOpen
+						bind:hex={editedItem.color}
+						bind:disableCloseClickOutside={isPickerDisabled}
+						sliderDirection={'horizontal'}
+						components={ChromeVariant}
+						textInputModes={['hex']}
+						isTextInput={false}
+						label={''}
+						--input-size="24px"
+						--input-radius=""
+					/>
+					<input
+						class="text-white text-base bg-transparent outline-none"
+						type="text"
+						bind:value={editedItem.color}
+					/>
+				</div>
+			</div>
 			<div class="flex flex-row gap-5 mt-5 justify-between items-center">
-				{#if editedItem.id !== Date.now().toString()}
-					<button
-						class="bg-newtab text-sm outline outline-[#545454] outline-1 hover:outline-[#88a1d8] rounded hover:text-[#88a1d8] p-2 w-20 duration-100 mr-3"
-						on:click={deleteItem}><i class="fa-solid fa-trash"></i></button
-					>
-				{/if}
 				<button
 					class="bg-newtab text-sm outline outline-[#545454] outline-1 hover:outline-[#a7c080] rounded hover:text-[#a7c080] p-2 w-full duration-100"
 					on:click={save}>Save</button
@@ -129,3 +149,10 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.dark {
+		--cp-bg-color: #171717;
+		--cp-border-color: #171717;
+	}
+</style>

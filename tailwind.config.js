@@ -5,6 +5,7 @@ export default {
     extend: {
       colors: {
         'newtab': '#171717',
+        'light-blue': '#c1f4ff'
       },
       fontFamily: {
         Bitter: ["Bitter", "serif"],
