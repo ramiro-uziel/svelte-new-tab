@@ -84,7 +84,7 @@
 					<div
 						class="text-white text-base outline-dashed outline-[#464646] outline-1 p-3 rounded bg-transparent"
 					>
-						0.2
+						0.3
 					</div>
 				</div>
 			</div>
