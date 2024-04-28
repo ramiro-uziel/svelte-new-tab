@@ -311,7 +311,7 @@
 	</div>
 	<div class="fixed bottom-0 left-0 items-center space-x-2 p-8">
 		<button
-			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!infoModalVisible ? 'text-transparent hover:text-[#fdf6e3]' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
+			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!infoModalVisible ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 			on:click={toggleInfo}
 			on:keydown={handleKeydown}
 		>
