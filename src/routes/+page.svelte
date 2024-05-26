@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
 	import { onDestroy, onMount } from 'svelte';
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';
@@ -7,17 +8,19 @@
 	import { getDefaultColumns } from '$lib/columns';
 	import ItemEditModal from '../components/ItemEditModal.svelte';
 	import ColumnEditModal from '../components/ColumnEditModal.svelte';
-	import InfoModal from '../components/InfoModal.svelte';
+	import SettingsModal from '../components/SettingsModal.svelte';
+	import StartupModal from '../components/StartupModal.svelte';
 
 	const flipDurationMs = 150;
 	let isReady = false;
 	let dragDisabled = true;
-	let morphDisabled = false;
 	let infoModalVisible = false;
 	let showItemEditModal = false;
 	let showColumnEditModal = false;
+	let startupModalVisible = false;
 
-	$: anyModalVisible = infoModalVisible || showItemEditModal || showColumnEditModal;
+	$: anyModalVisible =
+		infoModalVisible || showItemEditModal || showColumnEditModal || startupModalVisible;
 
 	let columns: {
 		id: any;
@@ -74,6 +77,11 @@
 		infoModalVisible = !infoModalVisible;
 	}
 
+	function toggleStartup() {
+		startupModalVisible = !startupModalVisible;
+		isReady = true;
+	}
+
 	// --------------- MODALS ---------------
 
 	function openItemModal(item: { id: string; text: string; icon: string; url: string }): void {
@@ -121,7 +129,7 @@
 			items: []
 		};
 		columns = [...columns, newColumn];
-		saveColumnsToStorage();
+		saveColumnsToStorage(columns);
 	}
 
 	// --------------- LOADING AND SAVING  ---------------
@@ -129,15 +137,36 @@
 	function loadColumnsFromStorage() {
 		if (typeof window !== 'undefined') {
 			const storedColumns = localStorage.getItem('columnsData');
-			return storedColumns ? JSON.parse(storedColumns) : getDefaultColumns();
+			if (storedColumns) {
+				return JSON.parse(storedColumns);
+			} else {
+				const defaultColumns = getDefaultColumns();
+				saveColumnsToStorage(defaultColumns);
+				startupModalVisible = true;
+				return defaultColumns;
+			}
 		}
 		return getDefaultColumns();
 	}
 
-	function saveColumnsToStorage() {
+	function saveColumnsToStorage(
+		columns: {
+			id: any;
+			text: string;
+			icon: string;
+			color: string;
+			items: { id: string; text: string; icon: string; url: string }[];
+		}[]
+	) {
 		if (typeof window !== 'undefined') {
 			localStorage.setItem('columnsData', JSON.stringify(columns));
 		}
+	}
+
+	function reloadColumnsFromStorage() {
+		console.log('Page reload triggered.');
+		columns = loadColumnsFromStorage();
+		// columns = [...columns];
 	}
 
 	// --------------- ACTION HANDLERS  ---------------
@@ -166,7 +195,7 @@
 			}
 		}
 		columns = [...columns];
-		saveColumnsToStorage();
+		saveColumnsToStorage(columns);
 		showItemEditModal = false;
 	}
 
@@ -177,7 +206,7 @@
 			items: column.items.filter((item) => item.id !== itemId)
 		}));
 		columns = [...columns];
-		saveColumnsToStorage();
+		saveColumnsToStorage(columns);
 		showItemEditModal = false;
 	}
 
@@ -193,7 +222,7 @@
 		const updatedItem = event.detail;
 		const index = columns.findIndex((col) => col.id === updatedItem.id);
 		columns[index] = updatedItem;
-		saveColumnsToStorage();
+		saveColumnsToStorage(columns);
 		showColumnEditModal = false;
 	}
 
@@ -201,7 +230,7 @@
 		const columnId = event.detail;
 		columns = columns.filter((column) => column.id !== columnId);
 		columns = [...columns];
-		saveColumnsToStorage();
+		saveColumnsToStorage(columns);
 		showColumnEditModal = false;
 	}
 
@@ -222,7 +251,7 @@
 		i: number
 	) {
 		columns[i].items = e.detail.items;
-		saveColumnsToStorage();
+		saveColumnsToStorage(columns);
 	}
 
 	function handleColumnConsider(e: CustomEvent<DndEvent<(typeof columns)[0]>>) {
@@ -233,7 +262,7 @@
 	function handleColumnFinalize(e: CustomEvent<DndEvent<(typeof columns)[0]>>) {
 		const newColumns = e.detail.items;
 		columns = newColumns;
-		saveColumnsToStorage();
+		saveColumnsToStorage(columns);
 	}
 
 	// --------------- KEYDOWN HANDLERS  ---------------
@@ -265,15 +294,30 @@
 
 	// --------------- PAGE MOUNT  ---------------
 
+	function setReady() {
+		isReady = true;
+		console.log('Set Ready');
+	}
+
 	onMount(() => {
 		setTimeout(() => {
 			columns = loadColumnsFromStorage();
-			isReady = true;
+			if (!startupModalVisible) {
+				setReady();
+			}
 		}, 0);
 	});
 </script>
 
 <body class="bg-newtab overflow-y-auto overflow-x-clip">
+	{#if startupModalVisible}
+		<StartupModal
+			on:close={toggleStartup}
+			on:reload={reloadColumnsFromStorage}
+			on:ready={setReady}
+		/>
+	{/if}
+
 	{#if showItemEditModal}
 		<ItemEditModal
 			item={currentItem}
@@ -293,29 +337,36 @@
 	{/if}
 
 	{#if infoModalVisible}
-		<InfoModal on:close={toggleInfo} />
+		<SettingsModal on:close={toggleInfo} on:reload={reloadColumnsFromStorage} />
 	{/if}
 
 	<div class="fixed bottom-0 right-0 items-center space-x-2 p-8">
-		{#if !dragDisabled}
+		{#if !dragDisabled && !infoModalVisible}
 			<button
 				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 				on:click={addNewColumn}
 				><i class="fa-solid fa-plus p-5" />
-			</button>{/if}<button
-			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
-			on:click={toggleDragAbility}
-			on:keydown={handleKeydown}
-			><i class="fa-solid fa-pencil p-5"></i>
-		</button>
+			</button>{/if}{#if !infoModalVisible}<button
+				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
+				on:click={toggleDragAbility}
+				on:keydown={handleKeydown}
+				><i class="fa-solid fa-pencil p-5"></i>
+			</button>{/if}
 	</div>
-	<div class="fixed bottom-0 left-0 items-center space-x-2 p-8">
+	{#if dev}
+		<div
+			class="fixed bottom-0 w-full pointer-events-none text-center p-12 text-[#fdf6e31a] select-none font-Bitter font-bold"
+		>
+			Dev <i class="fa-solid fa-flask pl-2 text-sm"></i>
+		</div>
+	{/if}
+	<div class="fixed bottom-0 left-0 items-center space-x-2 p-8 z-10">
 		<button
 			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!infoModalVisible ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 			on:click={toggleInfo}
 			on:keydown={handleKeydown}
 		>
-			<i class="fa-solid fa-info p-5"></i>
+			<i class="fa-solid fa-gear p-5"></i>
 		</button>
 	</div>
 	<div class={`flex p-10 justify-center  ${centerItems ? 'h-screen items-center' : ''}`}>
@@ -330,7 +381,6 @@
 					type: 'columns',
 					flipDurationMs,
 					dragDisabled,
-					morphDisabled,
 					dropTargetStyle: {
 						outline: 'rgba(255, 255, 255, 0.3) solid 1px',
 						borderRadius: '10px',
@@ -355,7 +405,8 @@
 										event.stopPropagation();
 									}}
 								>
-									<i class="fa-solid fa-plus text-[20px] p-2 hover:text-light-blue duration-200"
+									<i
+										class="fa-solid fa-plus text-[20px] p-2 hover:text-light-blue transition-colors duration-200"
 									></i>
 								</button>
 
@@ -367,7 +418,9 @@
 										event.stopPropagation();
 									}}
 								>
-									<i class="fa-solid fa-gear text-[20px] hover:text-light-blue duration-200"></i>
+									<i
+										class="fa-solid fa-gear text-[20px] hover:text-light-blue transition-colors duration-200"
+									></i>
 								</button>
 							{/if}
 						</div>
@@ -379,21 +432,20 @@
 								type: 'column.items',
 								flipDurationMs,
 								dragDisabled,
-								morphDisabled,
 								dropTargetStyle: {
 									outline: 'rgba(255, 255, 255, 0.3) solid 1px',
 									borderRadius: '10px',
 									outlineStyle: 'dashed'
 								}
 							}}
-							class="flex flex-col space-y-2 p-2 min-h-[23vh]"
+							class="flex flex-col space-y-2 p-2 min-h-[22vh]"
 						>
 							{#each column.items as item (item.id)}
 								<a
 									href={dragDisabled ? item.url : undefined}
-									class="bg-newtab p-2 px-2 rounded-[10px] border border-[#545454] text-[#fdf6e3]
+									class="bg-newtab p-2 px-2 select-none rounded-[10px] border border-[#545454] text-[#fdf6e3]
 						hover:bg-[#2c2c2c] hover:border-[#c1f4ff] hover:text-[#c1f4ff]
-						font-Bitter text-[18px] flex items-center duration-75 min-h-[45px]"
+						font-Bitter text-[18px] flex items-center transition-colors duration-75 min-h-[45px]"
 									animate:flip={{ duration: flipDurationMs, easing: quintOut }}
 								>
 									<div class="w-[30px] flex justify-center ml-[-4px] mr-1">
@@ -412,7 +464,7 @@
 											}}
 										>
 											<i
-												class="fa-solid fa-gear text-[#fdf6e3] hover:text-[#c1f4ff] px-[2px] duration-200"
+												class="fa-solid fa-gear text-[#fdf6e3] hover:text-[#c1f4ff] px-[2px] transition-colors duration-200"
 											></i>
 										</button>
 									{/if}

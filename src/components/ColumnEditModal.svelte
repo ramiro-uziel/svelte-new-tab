@@ -154,16 +154,16 @@
 				<div class="flex flex-row gap-5 mt-5 justify-between items-center">
 					{#if editedItem.id !== Date.now().toString()}
 						<button
-							class="bg-newtab text-sm outline outline-[#545454] outline-1 hover:outline-[#88a1d8] rounded hover:text-[#88a1d8] p-2 w-20 duration-100 mr-3"
+							class="bg-newtab text-sm active:translate-y-[1px] outline outline-[#545454] outline-1 hover:outline-[#88a1d8] rounded hover:text-[#88a1d8] p-2 w-20 duration-100 mr-3"
 							on:click={deleteItem}><i class="fa-solid fa-trash"></i></button
 						>
 					{/if}
 					<button
-						class="bg-newtab text-sm outline outline-[#545454] outline-1 hover:outline-[#a7c080] rounded hover:text-[#a7c080] p-2 w-full duration-100"
+						class="bg-newtab text-sm active:translate-y-[1px] outline outline-[#545454] outline-1 hover:outline-[#a7c080] rounded hover:text-[#a7c080] p-2 w-full duration-100"
 						on:click={save}>Save</button
 					>
 					<button
-						class="bg-newtab text-sm outline outline-[#545454] outline-1 hover:outline-[#e67e80] rounded hover:text-[#e67e80] p-2 w-full duration-100"
+						class="bg-newtab text-sm active:translate-y-[1px] outline outline-[#545454] outline-1 hover:outline-[#e67e80] rounded hover:text-[#e67e80] p-2 w-full duration-100"
 						on:click={cancel}>Cancel</button
 					>
 				</div>
