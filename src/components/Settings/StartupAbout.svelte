@@ -1,7 +1,9 @@
 <script lang="ts">
 	let links: { url: string; logo: string }[] = [
-		{ url: 'https://x.com/ie_beep', logo: 'fa-brands fa-twitter' },
-		{ url: 'https://another-example.com', logo: 'fa-brands fa-github' }
+		/*
+		{ url: '', logo: 'fa-brands fa-twitter' }
+		{ url: '', logo: 'fa-brands fa-github' }
+		*/
 	];
 </script>
 
@@ -36,7 +38,7 @@
 		class="text-white text-md flex flex-col gap-1 mt-7 selection:bg-[#39756d] justify-center items-center flex-1 mb-10"
 	>
 		<span class="text-white flex text-3xl">new-tab</span>
-		<span class="text-white flex text-lg">made by ico</span>
+		<span class="text-white flex text-lg">made by rm</span>
 		<div class="flex flex-row gap-3 mt-3">
 			{#each links as link}
 				<a href={link.url} target="_blank"
