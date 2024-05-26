@@ -164,7 +164,6 @@
 	}
 
 	function reloadColumnsFromStorage() {
-		console.log('Page reload triggered.');
 		columns = loadColumnsFromStorage();
 		// columns = [...columns];
 	}
@@ -296,7 +295,6 @@
 
 	function setReady() {
 		isReady = true;
-		console.log('Set Ready');
 	}
 
 	onMount(() => {

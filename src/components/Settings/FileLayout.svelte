@@ -38,19 +38,12 @@
 
 		if ('showSaveFilePicker' in window) {
 			try {
-				// Show save file picker
 				const handle = await (window as any).showSaveFilePicker({
 					suggestedName: filename,
 					...options
 				});
-
-				// Create a writable stream
 				const writable = await handle.createWritable();
-
-				// Write the contents of the file
 				await writable.write(JSON.stringify(data, null, 2));
-
-				// Close the file and write the contents to disk
 				await writable.close();
 			} catch (error) {
 				console.error('Error saving file:', error);
