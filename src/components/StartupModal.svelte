@@ -7,12 +7,12 @@
 	import StartupAbout from './Settings/StartupAbout.svelte';
 	import StartupFileLayout from './Settings/StartupFileLayout.svelte';
 	import Donate from './Settings/Donate.svelte';
+	import Placeholder from './Settings/Placeholder.svelte';
 
 	let parent: Element;
 	let enabled = true;
 
 	const dispatch = createEventDispatcher();
-	let renderSVG = true; // Control re-render
 
 	function close() {
 		dispatch('close');
@@ -50,15 +50,8 @@
 	let items = [
 		{ label: 'First Time', icon: 'fa-solid fa-house', value: 1, component: StartupAbout },
 		{ label: 'Layout', icon: 'fa-solid fa-list', value: 2, component: StartupFileLayout },
-		{ label: 'Donate', icon: 'fa-solid fa-heart', value: 4, component: Donate }
+		{ label: 'Donate', icon: 'fa-solid fa-heart', value: 4, component: Placeholder }
 	];
-
-	function handleTabChange() {
-		renderSVG = false; // Hide SVG
-		setTimeout(() => {
-			renderSVG = true; // Show SVG after a short delay
-		}, 0);
-	}
 </script>
 
 <div transition:fade={{ duration: 80 }}>
@@ -99,13 +92,7 @@
 				<rect width="100%" height="100%" filter="url(#turbulence)" />
 			</svg>
 			<div class="mt-0 py-5 px-8 mb-2 min-h-[475px] min-w-[585px]">
-				<Tabs
-					{items}
-					on:tabchange={handleTabChange}
-					on:close={close}
-					on:reload={reload}
-					on:ready={ready}
-				>
+				<Tabs {items} on:close={close} on:reload={reload} on:ready={ready}>
 					<div slot="close"><span class="fa-solid fa-close" /></div>
 				</Tabs>
 			</div>

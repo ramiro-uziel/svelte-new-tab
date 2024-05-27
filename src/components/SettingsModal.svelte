@@ -6,7 +6,7 @@
 	import Tabs from './Tabs.svelte';
 	import About from './Settings/About.svelte';
 	import FileLayout from './Settings/FileLayout.svelte';
-	import Theming from './Settings/Theming.svelte';
+	import Theming from './Settings/Theming/Theming.svelte';
 	import Donate from './Settings/Donate.svelte';
 	import Placeholder from './Settings/Placeholder.svelte';
 
@@ -45,7 +45,7 @@
 	let items = [
 		{ label: 'About', icon: 'fa-solid fa-circle-info', value: 1, component: About },
 		{ label: 'Layout', icon: 'fa-solid fa-list', value: 2, component: FileLayout },
-		{ label: 'Theming', icon: 'fa-solid fa-palette', value: 3, component: Placeholder },
+		{ label: 'Theming', icon: 'fa-solid fa-palette', value: 3, component: Theming },
 		{ label: 'Donate', icon: 'fa-solid fa-heart', value: 4, component: Placeholder }
 	];
 </script>

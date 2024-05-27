@@ -1,4 +1,3 @@
-<!-- ItemEditModal.svelte -->
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
 	import { createEventDispatcher, onDestroy } from 'svelte';
@@ -170,11 +169,11 @@
 			</div>
 		</div>
 	</div>
-
-	<style>
-		.dark {
-			--cp-bg-color: #171717;
-			--cp-border-color: #171717;
-		}
-	</style>
 </div>
+
+<style>
+	.dark {
+		--cp-bg-color: #171717;
+		--cp-border-color: #171717;
+	}
+</style>
