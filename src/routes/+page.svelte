@@ -353,7 +353,7 @@
 	</div>
 	{#if dev}
 		<div
-			class="fixed bottom-0 w-full pointer-events-none text-center p-12 text-[#fdf6e31a] select-none font-Bitter font-bold"
+			class="fixed bottom-0 w-full pointer-events-none text-center p-12 text-[#fdf6e31a] select-none font-Bitter font-bold z-10"
 		>
 			Dev <i class="fa-solid fa-flask pl-2 text-sm"></i>
 		</div>

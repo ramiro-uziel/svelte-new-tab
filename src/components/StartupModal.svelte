@@ -6,7 +6,7 @@
 	import Tabs from './Tabs.svelte';
 	import StartupAbout from './Settings/StartupAbout.svelte';
 	import StartupFileLayout from './Settings/StartupFileLayout.svelte';
-	import Donate from './Settings/Donate.svelte';
+	import Donate from './Settings/DonateStartup.svelte';
 	import Placeholder from './Settings/Placeholder.svelte';
 
 	let parent: Element;
@@ -50,7 +50,7 @@
 	let items = [
 		{ label: 'First Time', icon: 'fa-solid fa-house', value: 1, component: StartupAbout },
 		{ label: 'Layout', icon: 'fa-solid fa-list', value: 2, component: StartupFileLayout },
-		{ label: 'Donate', icon: 'fa-solid fa-heart', value: 4, component: Placeholder }
+		{ label: 'Donate', icon: 'fa-solid fa-heart', value: 4, component: Donate }
 	];
 </script>
 
