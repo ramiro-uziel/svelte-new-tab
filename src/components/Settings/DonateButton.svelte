@@ -1,4 +1,5 @@
 <script>
+	import cup from '$lib/images/cup-border.webp';
 </script>
 
 <span class="hover-container">
@@ -7,7 +8,7 @@
 		href="https://ko-fi.com/R6R1WK3Y"
 		target="_blank"
 	>
-		<img src="/images/cup-border.webp" alt="Cup" class="w-7 boop" />
+		<img src={cup} alt="Cup" class="w-7 boop" />
 		Support me on Ko-fi
 	</a>
 </span>

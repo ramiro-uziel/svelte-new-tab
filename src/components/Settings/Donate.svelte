@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Boop from './Boop.svelte';
+	import DonateButton from './DonateButton.svelte';
 	let links: { url: string; logo: string }[] = [
 		/*
 		{ url: '', logo: 'fa-brands fa-twitter' }
@@ -12,7 +12,7 @@
 	<div class="text-white text-md flex flex-col gap-4 selection:bg-[#39756d] w-72 px-5 mt-8">
 		<div class="flex flex-col gap-2">
 			Ko-fi
-			<Boop></Boop>
+			<DonateButton />
 		</div>
 	</div>
 	<div
