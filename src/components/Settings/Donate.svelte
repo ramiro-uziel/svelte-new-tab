@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Boop from "./Boop.svelte"
+	import Boop from './Boop.svelte';
 	let links: { url: string; logo: string }[] = [
 		/*
 		{ url: '', logo: 'fa-brands fa-twitter' }
@@ -12,15 +12,14 @@
 	<div class="text-white text-md flex flex-col gap-4 selection:bg-[#39756d] w-72 px-5 mt-8">
 		<div class="flex flex-col gap-2">
 			Ko-fi
-			<Boop>
-			</Boop>
+			<Boop></Boop>
 		</div>
 	</div>
 	<div
 		class="text-white text-md flex flex-col gap-1 mt-10 selection:bg-[#39756d] justify-center items-center flex-1 mb-10"
 	>
 		<span class="text-white flex text-3xl">new-tab</span>
-		<span class="text-white flex text-lg">made by rm</span>
+		<span class="text-white flex text-lg">made by ico</span>
 		<div class="flex flex-row gap-3 mt-3">
 			{#each links as link}
 				<a href={link.url} target="_blank"
