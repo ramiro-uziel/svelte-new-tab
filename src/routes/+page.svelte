@@ -10,17 +10,22 @@
 	import ColumnEditModal from '../components/ColumnEditModal.svelte';
 	import SettingsModal from '../components/SettingsModal.svelte';
 	import StartupModal from '../components/StartupModal.svelte';
+	import SearchModal from '../components/SearchModal.svelte';
 
 	const flipDurationMs = 150;
+
 	let isReady = false;
 	let dragDisabled = true;
-	let infoModalVisible = false;
+
+	let startupModal = false;
+	let settingsModal = false;
+
 	let showItemEditModal = false;
 	let showColumnEditModal = false;
-	let startupModalVisible = false;
 
-	$: anyModalVisible =
-		infoModalVisible || showItemEditModal || showColumnEditModal || startupModalVisible;
+	let searchModal = false;
+
+	$: anyModalVisible = settingsModal || showItemEditModal || showColumnEditModal || startupModal;
 
 	let columns: {
 		id: any;
@@ -73,12 +78,16 @@
 		dragDisabled = !dragDisabled;
 	}
 
-	function toggleInfo() {
-		infoModalVisible = !infoModalVisible;
+	function toggleSettings() {
+		settingsModal = !settingsModal;
+	}
+
+	function toggleSearch() {
+		searchModal = !searchModal;
 	}
 
 	function toggleStartup() {
-		startupModalVisible = !startupModalVisible;
+		startupModal = !startupModal;
 		isReady = true;
 	}
 
@@ -142,7 +151,7 @@
 			} else {
 				const defaultColumns = getDefaultColumns();
 				saveColumnsToStorage(defaultColumns);
-				startupModalVisible = true;
+				startupModal = true;
 				return defaultColumns;
 			}
 		}
@@ -280,6 +289,17 @@
 			} else if (event.key === 'Escape') {
 				dragDisabled = true;
 			}
+
+			if (event.key === 's') {
+				const activeElement = document.activeElement;
+				const typingInInput =
+					activeElement &&
+					(activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');
+				if (!typingInInput) {
+					event.preventDefault();
+					toggleSearch();
+				}
+			}
 		};
 
 		onMount(() => {
@@ -300,7 +320,7 @@
 	onMount(() => {
 		setTimeout(() => {
 			columns = loadColumnsFromStorage();
-			if (!startupModalVisible) {
+			if (!startupModal) {
 				setReady();
 			}
 		}, 0);
@@ -308,7 +328,7 @@
 </script>
 
 <body class="bg-newtab overflow-y-auto overflow-x-clip">
-	{#if startupModalVisible}
+	{#if startupModal}
 		<StartupModal
 			on:close={toggleStartup}
 			on:reload={reloadColumnsFromStorage}
@@ -334,17 +354,20 @@
 		/>
 	{/if}
 
-	{#if infoModalVisible}
-		<SettingsModal on:close={toggleInfo} on:reload={reloadColumnsFromStorage} />
+	{#if settingsModal}
+		<SettingsModal on:close={toggleSettings} on:reload={reloadColumnsFromStorage} />
 	{/if}
 
+	{#if searchModal}
+		<SearchModal on:close={toggleSearch} />
+	{/if}
 	<div class="fixed bottom-0 right-0 items-center space-x-2 p-8">
-		{#if !dragDisabled && !infoModalVisible}
+		{#if !dragDisabled && !settingsModal}
 			<button
 				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 				on:click={addNewColumn}
 				><i class="fa-solid fa-plus p-5" />
-			</button>{/if}{#if !infoModalVisible}<button
+			</button>{/if}{#if !settingsModal}<button
 				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 				on:click={toggleDragAbility}
 				on:keydown={handleKeydown}
@@ -360,8 +383,8 @@
 	{/if}
 	<div class="fixed bottom-0 left-0 items-center space-x-2 p-8 z-10">
 		<button
-			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!infoModalVisible ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
-			on:click={toggleInfo}
+			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!settingsModal ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
+			on:click={toggleSettings}
 			on:keydown={handleKeydown}
 		>
 			<i class="fa-solid fa-gear p-5"></i>
