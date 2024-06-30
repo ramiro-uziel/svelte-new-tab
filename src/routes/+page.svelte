@@ -11,11 +11,11 @@
 	import StartupModal from '../components/StartupModal.svelte';
 	import SearchModal from '../components/SearchModal.svelte';
 	import {
-		startupModal,
-		settingsModal,
+		showStartupModal,
+		showSettingsModal,
 		showItemEditModal,
 		showColumnEditModal,
-		searchModal,
+		showSearchModal,
 		dragDisabled,
 		openItemModal,
 		openColumnModal,
@@ -27,15 +27,15 @@
 		isReady
 	} from '$lib/modal';
 	import {
-		columns,
 		currentItem,
 		currentColumn,
+		columns,
 		loadColumnsFromStorage,
 		saveColumnsToStorage,
 		reloadColumnsFromStorage,
 		addNewItem,
 		addNewColumn
-	} from '$lib/columns';
+	} from '$lib/items_columns';
 	import {
 		handleItemSave,
 		handleItemDelete,
@@ -142,7 +142,7 @@
 	onMount(() => {
 		setTimeout(() => {
 			columns.set(loadColumnsFromStorage());
-			if (!$startupModal) {
+			if (!$showStartupModal) {
 				isReady.set(true);
 			}
 		}, 0);
@@ -150,7 +150,7 @@
 </script>
 
 <body class="bg-newtab overflow-y-auto overflow-x-clip">
-	{#if $startupModal}
+	{#if $showStartupModal}
 		<StartupModal
 			on:close={toggleStartup}
 			on:reload={reloadColumnsFromStorage}
@@ -176,23 +176,23 @@
 		/>
 	{/if}
 
-	{#if $settingsModal}
+	{#if $showSettingsModal}
 		<SettingsModal on:close={toggleSettings} on:reload={reloadColumnsFromStorage} />
 	{/if}
 
-	{#if $searchModal}
+	{#if $showSearchModal}
 		<SearchModal on:close={toggleSearch} />
 	{/if}
 
 	<div class="fixed bottom-0 right-0 items-center space-x-2 p-8">
-		{#if !$dragDisabled && !$settingsModal}
+		{#if !$dragDisabled && !$showSettingsModal}
 			<button
 				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${$dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 				on:click={addNewColumn}
 				><i class="fa-solid fa-plus p-5" />
 			</button>
 		{/if}
-		{#if !$settingsModal}
+		{#if !$showSettingsModal}
 			<button
 				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${$dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 				on:click={toggleDragAbility}
@@ -212,7 +212,7 @@
 
 	<div class="fixed bottom-0 left-0 items-center space-x-2 p-8 z-10">
 		<button
-			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!$settingsModal ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
+			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!$showSettingsModal ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 			on:click={toggleSettings}
 			on:keydown={handleKeydown}
 		>

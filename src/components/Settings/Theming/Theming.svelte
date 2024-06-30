@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { hexToHSL, HSLToHex } from '$lib/utils/color';
-	import Knob from './Knob.svelte';
+	// import Knob from './Knob.svelte';
+	import Knob from './Knob/Knob.svelte';
 
 	interface Item {
 		id: string;
@@ -110,7 +111,8 @@
 <div class="flex flex-row">
 	<div class="flex flex-col mr-10 gap-2 justify-center items-center">
 		<p class="text-white">Hue</p>
-		<Knob bind:value max={100} min={0} pixelRange={180} />
+		<!-- <Knob bind:value max={100} min={0} pixelRange={180} /> -->
+		<Knob bind:value max={100} min={0} />
 		<div class="flex flex-col gap-3 mt-3">
 			<button on:click={saveColors}>
 				<i

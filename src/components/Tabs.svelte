@@ -25,26 +25,22 @@
 >
 	{#each items as item}
 		<li class="mb-[-1px]">
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<span
+			<button
 				class={`block p-2 px-3 w-auto cursor-pointer select-none border rounded-lg duration-75 active:scale-[97%]  ${activeTabValue === item.value ? 'text-[#fdf6e3] border-[#a7a7a7] bg-[#44444438] ' : 'border-transparent hover:text-light-blue hover:border-[#444444] '}`}
 				on:click={handleClick(item.value)}
 			>
 				<i class={`mr-1 text-sm ${item.icon}`} />
 				{item.label}
-			</span>
+			</button>
 		</li>
 	{/each}
 	<li class="mb-[-1px]">
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		<span
+		<button
 			class={`block p-2 px-4 w-auto cursor-pointer select-none border border-transparent rounded-lg duration-100 active:translate-y-[1px] hover:text-light-blue`}
 			on:click={close}
 		>
 			<slot name="close"></slot>
-		</span>
+		</button>
 	</li>
 </ul>
 {#each items as item}

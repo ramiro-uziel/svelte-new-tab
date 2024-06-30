@@ -1,30 +1,32 @@
-import { writable, derived, get } from 'svelte/store';
-import { currentItem, currentColumn } from './columns';
+/* Handling of menus/modals */
 
-export const startupModal = writable(false);
-export const settingsModal = writable(false);
+import { writable, derived, get } from 'svelte/store';
+import { currentItem, currentColumn } from './items_columns';
+
+export const showStartupModal = writable(false);
+export const showSettingsModal = writable(false);
 export const showItemEditModal = writable(false);
 export const showColumnEditModal = writable(false);
-export const searchModal = writable(false);
+export const showSearchModal = writable(false);
 export const dragDisabled = writable(true);
 
 export const anyModalVisible = derived(
-	[startupModal, settingsModal, showItemEditModal, showColumnEditModal],
+	[showStartupModal, showSettingsModal, showItemEditModal, showColumnEditModal],
 	([$startupModal, $settingsModal, $showItemEditModal, $showColumnEditModal]) =>
 		$startupModal || $settingsModal || $showItemEditModal || $showColumnEditModal
 );
 
 export function toggleSettings() {
-	settingsModal.update((value) => !value);
+	showSettingsModal.update((value) => !value);
 }
 
 export function toggleSearch() {
 	if (!get(anyModalVisible) && get(dragDisabled)) {
-		searchModal.update((value) => !value);
+		showSearchModal.update((value) => !value);
 	}
 }
 export function toggleStartup() {
-	startupModal.update((value) => !value);
+	showStartupModal.update((value) => !value);
 	isReady.set(true);
 }
 

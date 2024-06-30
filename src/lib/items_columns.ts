@@ -1,6 +1,8 @@
+/* Adding, saving, loading for columns and items */
+
 import { get, writable } from 'svelte/store';
-import { getDefaultColumns } from '$lib/defaultcols';
-import { startupModal, showItemEditModal } from './modal';
+import { getDefaultColumns } from '$lib/default_columns';
+import { showStartupModal, showItemEditModal } from './modal';
 
 export const currentItem = writable<
 	| {
@@ -41,7 +43,7 @@ export function loadColumnsFromStorage() {
 		} else {
 			const defaultColumns = getDefaultColumns();
 			saveColumnsToStorage(defaultColumns);
-			startupModal.set(true);
+			showStartupModal.set(true);
 			return defaultColumns;
 		}
 	}

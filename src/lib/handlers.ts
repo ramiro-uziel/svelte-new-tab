@@ -1,7 +1,9 @@
+/* Save, Delete handlers*/
+
 import { get } from 'svelte/store';
-import { columns, saveColumnsToStorage } from './columns';
+import { columns, saveColumnsToStorage } from './items_columns';
 import { showItemEditModal, showColumnEditModal } from './modal';
-import { currentColumn } from './columns';
+import { currentColumn } from './items_columns';
 
 export function handleItemSave(
 	event: CustomEvent<{ id: string; text: string; icon: string; url: string }>
