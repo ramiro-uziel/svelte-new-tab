@@ -117,8 +117,10 @@
 			} else if (event.key === 'Escape') {
 				dragDisabled.set(true);
 			}
-
-			if (event.key === 's' || event.key === 'S') {
+			if ((event.key === 'k' || event.key === 'K') && event.ctrlKey) {
+				event.preventDefault();
+				toggleSearch();
+			} else if (event.key === 's' || event.key === 'S') {
 				const activeElement = document.activeElement;
 				const typingInInput =
 					activeElement &&
