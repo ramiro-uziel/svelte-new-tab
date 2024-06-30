@@ -290,7 +290,7 @@
 				dragDisabled = true;
 			}
 
-			if (event.key === 's') {
+			if (event.key === 's' || event.key === 'S') {
 				const activeElement = document.activeElement;
 				const typingInInput =
 					activeElement &&
@@ -381,6 +381,7 @@
 			Dev <i class="fa-solid fa-flask pl-2 text-sm"></i>
 		</div>
 	{/if}
+
 	<div class="fixed bottom-0 left-0 items-center space-x-2 p-8 z-10">
 		<button
 			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!settingsModal ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}

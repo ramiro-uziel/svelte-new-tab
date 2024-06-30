@@ -38,7 +38,7 @@
 		class="text-white text-md flex flex-col gap-1 mt-7 selection:bg-[#39756d] justify-center items-center flex-1 mb-10"
 	>
 		<span class="text-white flex text-3xl">new-tab</span>
-		<span class="text-white flex text-lg">made by rm</span>
+		<span class="text-white flex text-lg">made by ico</span>
 		<div class="flex flex-row gap-3 mt-3">
 			{#each links as link}
 				<a href={link.url} target="_blank"
