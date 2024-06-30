@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
@@ -14,13 +14,10 @@
 		dispatch('ready');
 	}
 
-	/**
-	 * @type {any[]}
-	 */
-	export let items = [];
+	export let items: any[] = [];
 	export let activeTabValue = 1;
 
-	const handleClick = (/** @type {number} */ tabValue) => () => (activeTabValue = tabValue);
+	const handleClick = (tabValue: number) => () => (activeTabValue = tabValue);
 </script>
 
 <ul

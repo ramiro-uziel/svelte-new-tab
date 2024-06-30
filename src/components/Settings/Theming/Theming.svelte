@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { hexToHSL, HSLToHex } from '$lib/utils/color';
+	import Knob from './Knob.svelte';
 
 	interface Item {
 		id: string;
@@ -23,7 +24,6 @@
 		backupOriginalColor: string;
 	}
 
-	import Knob from './Knob.svelte';
 	let value = 0;
 	let sections: SectionWithBackup[] = [];
 
@@ -125,7 +125,7 @@
 		</div>
 	</div>
 	<div
-		class="grid grid-cols-3 gap-4 flex-1 h-[200px] max-h-[200px] overflow-auto  overflow-x-hidden"
+		class="grid grid-cols-3 gap-4 flex-1 h-[200px] max-h-[200px] overflow-auto overflow-x-hidden"
 	>
 		{#each sections as section}
 			<div

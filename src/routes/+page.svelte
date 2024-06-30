@@ -5,275 +5,73 @@
 	import { quintOut } from 'svelte/easing';
 	import { dndzone, type DndEvent } from 'svelte-dnd-action';
 	import { fade } from 'svelte/transition';
-	import { getDefaultColumns } from '$lib/columns';
 	import ItemEditModal from '../components/ItemEditModal.svelte';
 	import ColumnEditModal from '../components/ColumnEditModal.svelte';
 	import SettingsModal from '../components/SettingsModal.svelte';
 	import StartupModal from '../components/StartupModal.svelte';
 	import SearchModal from '../components/SearchModal.svelte';
+	import {
+		startupModal,
+		settingsModal,
+		showItemEditModal,
+		showColumnEditModal,
+		searchModal,
+		dragDisabled,
+		openItemModal,
+		openColumnModal,
+		toggleSettings,
+		toggleSearch,
+		toggleStartup,
+		handleCancel,
+		anyModalVisible,
+		isReady
+	} from '$lib/modal';
+	import {
+		columns,
+		currentItem,
+		currentColumn,
+		loadColumnsFromStorage,
+		saveColumnsToStorage,
+		reloadColumnsFromStorage,
+		addNewItem,
+		addNewColumn
+	} from '$lib/columns';
+	import {
+		handleItemSave,
+		handleItemDelete,
+		handleColumnSave,
+		handleColumnDelete
+	} from '$lib/handlers';
 
 	const flipDurationMs = 150;
 
-	let isReady = false;
-	let dragDisabled = true;
-
-	let startupModal = false;
-	let settingsModal = false;
-
-	let showItemEditModal = false;
-	let showColumnEditModal = false;
-
-	let searchModal = false;
-
-	$: anyModalVisible = settingsModal || showItemEditModal || showColumnEditModal || startupModal;
-
-	let columns: {
-		id: any;
-		text: string;
-		icon: string;
-		color: string;
-		items: { id: string; text: string; icon: string; url: string }[];
-	}[];
-
-	let currentItem: {
-		id: string;
-		text: string;
-		icon: string;
-		url: string;
-	};
-
-	let currentColumn: {
-		id: any;
-		text: string;
-		icon: string;
-		color: string;
-		items: { id: string; text: string; icon: string; url: string }[];
-	};
-
-	// --------------- CONDITIONAL STYLE CLASSES  ---------------
-
 	let layoutClass = '';
 	$: {
-		if (Array.isArray(columns)) {
-			if (columns.length <= 3) {
-				layoutClass = `gap-x-10 grid grid-cols-${columns.length}`;
+		const colArray = $columns;
+		if (Array.isArray(colArray)) {
+			if (colArray.length <= 3) {
+				layoutClass = `gap-x-10 grid grid-cols-${colArray.length}`;
 			} else {
-				const cols = Math.min(Math.ceil(columns.length / 2), 6);
+				const cols = Math.min(Math.ceil(colArray.length / 2), 6);
 				layoutClass = `gap-x-28 gap-y-10 grid grid-cols-${cols}`;
 			}
 		}
 	}
 
 	let centerItems = true;
-	$: if (Array.isArray(columns) && columns.length > 0) {
-		centerItems = columns.length <= 18;
+	$: {
+		const colArray = $columns;
+		if (Array.isArray(colArray) && colArray.length > 0) {
+			centerItems = colArray.length <= 18;
+		}
 	}
-
-	// --------------- PAGE BUTTONS ---------------
 
 	function toggleDragAbility() {
-		if (showItemEditModal) {
-			showItemEditModal = false;
+		if ($showItemEditModal) {
+			showItemEditModal.set(false);
 		}
-		dragDisabled = !dragDisabled;
+		dragDisabled.update((value) => !value);
 	}
-
-	function toggleSettings() {
-		settingsModal = !settingsModal;
-	}
-
-	function toggleSearch() {
-		searchModal = !searchModal;
-	}
-
-	function toggleStartup() {
-		startupModal = !startupModal;
-		isReady = true;
-	}
-
-	// --------------- MODALS ---------------
-
-	function openItemModal(item: { id: string; text: string; icon: string; url: string }): void {
-		currentItem = item;
-		showItemEditModal = true;
-	}
-
-	function openColumnModal(column: {
-		id: any;
-		text: string;
-		icon: string;
-		color: string;
-		items: { id: string; text: string; icon: string; url: string }[];
-	}): void {
-		currentColumn = column;
-		showColumnEditModal = true;
-	}
-
-	// --------------- ADDING ELEMENTS ---------------
-
-	function addNewItem(columnId: number) {
-		const column = columns.find((col) => col.id === columnId);
-		if (!column) {
-			console.error(
-				'[!] Error adding item. The column where the item is being added was not found.'
-			);
-			return;
-		}
-		currentColumn = column;
-		currentItem = {
-			id: Date.now().toString(),
-			text: '',
-			icon: '',
-			url: ''
-		};
-		showItemEditModal = true;
-	}
-
-	function addNewColumn() {
-		const newColumn = {
-			id: `col_${Date.now()}`,
-			text: 'Column',
-			icon: 'fa-solid fa-columns',
-			color: '#cccccc',
-			items: []
-		};
-		columns = [...columns, newColumn];
-		saveColumnsToStorage(columns);
-	}
-
-	// --------------- LOADING AND SAVING  ---------------
-
-	function loadColumnsFromStorage() {
-		if (typeof window !== 'undefined') {
-			const storedColumns = localStorage.getItem('columnsData');
-			if (storedColumns) {
-				return JSON.parse(storedColumns);
-			} else {
-				const defaultColumns = getDefaultColumns();
-				saveColumnsToStorage(defaultColumns);
-				startupModal = true;
-				return defaultColumns;
-			}
-		}
-		return getDefaultColumns();
-	}
-
-	function saveColumnsToStorage(
-		columns: {
-			id: any;
-			text: string;
-			icon: string;
-			color: string;
-			items: { id: string; text: string; icon: string; url: string }[];
-		}[]
-	) {
-		if (typeof window !== 'undefined') {
-			localStorage.setItem('columnsData', JSON.stringify(columns));
-		}
-	}
-
-	function reloadColumnsFromStorage() {
-		columns = loadColumnsFromStorage();
-		// columns = [...columns];
-	}
-
-	// --------------- ACTION HANDLERS  ---------------
-
-	function handleItemSave(
-		event: CustomEvent<{ id: string; text: string; icon: string; url: string }>
-	): void {
-		const updatedItem = event.detail;
-		const columnIndex = columns.findIndex((col) => col.items.some((i) => i.id === updatedItem.id));
-
-		if (columnIndex === -1) {
-			const targetColumnIndex = columns.findIndex((col) => col.id === currentColumn.id);
-			if (targetColumnIndex !== -1) {
-				columns[targetColumnIndex].items.push(updatedItem);
-			} else {
-				console.error('No valid column found to add new item');
-				return;
-			}
-		} else {
-			const itemIndex = columns[columnIndex].items.findIndex((i) => i.id === updatedItem.id);
-			if (itemIndex !== -1) {
-				columns[columnIndex].items[itemIndex] = updatedItem;
-			} else {
-				console.error('Item index not found, cannot update item');
-				return;
-			}
-		}
-		columns = [...columns];
-		saveColumnsToStorage(columns);
-		showItemEditModal = false;
-	}
-
-	function handleItemDelete(event: CustomEvent<string>): void {
-		const itemId = event.detail;
-		columns = columns.map((column) => ({
-			...column,
-			items: column.items.filter((item) => item.id !== itemId)
-		}));
-		columns = [...columns];
-		saveColumnsToStorage(columns);
-		showItemEditModal = false;
-	}
-
-	function handleColumnSave(
-		event: CustomEvent<{
-			id: any;
-			text: string;
-			icon: string;
-			color: string;
-			items: { id: string; text: string; icon: string; url: string }[];
-		}>
-	): void {
-		const updatedItem = event.detail;
-		const index = columns.findIndex((col) => col.id === updatedItem.id);
-		columns[index] = updatedItem;
-		saveColumnsToStorage(columns);
-		showColumnEditModal = false;
-	}
-
-	function handleColumnDelete(event: CustomEvent<string>): void {
-		const columnId = event.detail;
-		columns = columns.filter((column) => column.id !== columnId);
-		columns = [...columns];
-		saveColumnsToStorage(columns);
-		showColumnEditModal = false;
-	}
-
-	function handleCancel(): void {
-		showItemEditModal = false;
-		showColumnEditModal = false;
-	}
-
-	function handleItemConsider(
-		e: CustomEvent<DndEvent<{ id: string; text: string; icon: string; url: string }>>,
-		i: number
-	) {
-		columns[i].items = e.detail.items;
-	}
-
-	function handleItemFinalize(
-		e: CustomEvent<DndEvent<{ id: string; text: string; icon: string; url: string }>>,
-		i: number
-	) {
-		columns[i].items = e.detail.items;
-		saveColumnsToStorage(columns);
-	}
-
-	function handleColumnConsider(e: CustomEvent<DndEvent<(typeof columns)[0]>>) {
-		const newColumns = e.detail.items;
-		columns = newColumns;
-	}
-
-	function handleColumnFinalize(e: CustomEvent<DndEvent<(typeof columns)[0]>>) {
-		const newColumns = e.detail.items;
-		columns = newColumns;
-		saveColumnsToStorage(columns);
-	}
-
-	// --------------- KEYDOWN HANDLERS  ---------------
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
@@ -281,13 +79,43 @@
 		}
 	}
 
+	function handleColumnConsider(e: CustomEvent<DndEvent<(typeof $columns)[0]>>) {
+		const newColumns = e.detail.items;
+		columns.set(newColumns);
+	}
+
+	function handleColumnFinalize(e: CustomEvent<DndEvent<(typeof $columns)[0]>>) {
+		const newColumns = e.detail.items;
+		columns.set(newColumns);
+		saveColumnsToStorage(newColumns);
+	}
+
+	function handleItemConsider(
+		e: CustomEvent<DndEvent<{ id: string; text: string; icon: string; url: string }>>,
+		i: number
+	) {
+		const colArray = $columns;
+		colArray[i].items = e.detail.items;
+		columns.set(colArray);
+	}
+
+	function handleItemFinalize(
+		e: CustomEvent<DndEvent<{ id: string; text: string; icon: string; url: string }>>,
+		i: number
+	) {
+		const colArray = $columns;
+		colArray[i].items = e.detail.items;
+		columns.set(colArray);
+		saveColumnsToStorage(colArray);
+	}
+
 	if (typeof window !== 'undefined') {
 		const handleGlobalKeydown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape' && anyModalVisible) {
+			if (event.key === 'Escape' && $anyModalVisible) {
 				event.preventDefault();
 				event.stopPropagation();
 			} else if (event.key === 'Escape') {
-				dragDisabled = true;
+				dragDisabled.set(true);
 			}
 
 			if (event.key === 's' || event.key === 'S') {
@@ -311,69 +139,69 @@
 		});
 	}
 
-	// --------------- PAGE MOUNT  ---------------
-
-	function setReady() {
-		isReady = true;
-	}
-
 	onMount(() => {
 		setTimeout(() => {
-			columns = loadColumnsFromStorage();
-			if (!startupModal) {
-				setReady();
+			columns.set(loadColumnsFromStorage());
+			if (!$startupModal) {
+				isReady.set(true);
 			}
 		}, 0);
 	});
 </script>
 
 <body class="bg-newtab overflow-y-auto overflow-x-clip">
-	{#if startupModal}
+	{#if $startupModal}
 		<StartupModal
 			on:close={toggleStartup}
 			on:reload={reloadColumnsFromStorage}
-			on:ready={setReady}
+			on:ready={() => isReady.set(true)}
 		/>
 	{/if}
 
-	{#if showItemEditModal}
+	{#if $showItemEditModal}
 		<ItemEditModal
-			item={currentItem}
+			item={$currentItem}
 			on:save={handleItemSave}
 			on:cancel={handleCancel}
 			on:delete={handleItemDelete}
 		/>
 	{/if}
 
-	{#if showColumnEditModal}
+	{#if $showColumnEditModal}
 		<ColumnEditModal
-			item={currentColumn}
+			item={$currentColumn}
 			on:save={handleColumnSave}
 			on:cancel={handleCancel}
 			on:delete={handleColumnDelete}
 		/>
 	{/if}
 
-	{#if settingsModal}
+	{#if $settingsModal}
 		<SettingsModal on:close={toggleSettings} on:reload={reloadColumnsFromStorage} />
 	{/if}
 
-	{#if searchModal}
+	{#if $searchModal}
 		<SearchModal on:close={toggleSearch} />
 	{/if}
+
 	<div class="fixed bottom-0 right-0 items-center space-x-2 p-8">
-		{#if !dragDisabled && !settingsModal}
+		{#if !$dragDisabled && !$settingsModal}
 			<button
-				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
+				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${$dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 				on:click={addNewColumn}
 				><i class="fa-solid fa-plus p-5" />
-			</button>{/if}{#if !settingsModal}<button
-				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
+			</button>
+		{/if}
+		{#if !$settingsModal}
+			<button
+				class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${$dragDisabled ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 				on:click={toggleDragAbility}
 				on:keydown={handleKeydown}
 				><i class="fa-solid fa-pencil p-5"></i>
-			</button>{/if}
+			</button>
+		{/if}
 	</div>
+
 	{#if dev}
 		<div
 			class="fixed bottom-0 w-full pointer-events-none text-center p-12 text-[#fdf6e31a] select-none font-Bitter font-bold z-10"
@@ -384,25 +212,26 @@
 
 	<div class="fixed bottom-0 left-0 items-center space-x-2 p-8 z-10">
 		<button
-			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!settingsModal ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
+			class={`hover:text-[#666666] active:scale-90 text-xl duration-100 ${!$settingsModal ? 'text-transparent' : 'text-[#fdf6e3] hover:text-[#fdf6e3]'}`}
 			on:click={toggleSettings}
 			on:keydown={handleKeydown}
 		>
 			<i class="fa-solid fa-gear p-5"></i>
 		</button>
 	</div>
+
 	<div class={`flex p-10 justify-center  ${centerItems ? 'h-screen items-center' : ''}`}>
-		{#if isReady}
+		{#if $isReady}
 			<div
 				transition:fade={{ duration: 300 }}
 				class={`${layoutClass}`}
 				on:consider={(e) => handleColumnConsider(e)}
 				on:finalize={(e) => handleColumnFinalize(e)}
 				use:dndzone={{
-					items: columns,
+					items: $columns,
 					type: 'columns',
 					flipDurationMs,
-					dragDisabled,
+					dragDisabled: $dragDisabled,
 					dropTargetStyle: {
 						outline: 'rgba(255, 255, 255, 0.3) solid 1px',
 						borderRadius: '10px',
@@ -410,7 +239,7 @@
 					}
 				}}
 			>
-				{#each columns as column, i (column.id)}
+				{#each $columns as column, i (column.id)}
 					<div class="p-0.5" animate:flip={{ duration: flipDurationMs, easing: quintOut }}>
 						<div
 							class="text-2xl font-Bitter font-bold mb-3 flex items-center gap-3 pl-3"
@@ -418,7 +247,7 @@
 						>
 							<i class={column.icon} />
 							{column.text}
-							{#if !dragDisabled}
+							{#if !$dragDisabled}
 								<button
 									transition:fade={{ duration: 100 }}
 									class="ml-auto rounded-full bg-transparent"
@@ -453,7 +282,7 @@
 								items: column.items,
 								type: 'column.items',
 								flipDurationMs,
-								dragDisabled,
+								dragDisabled: $dragDisabled,
 								dropTargetStyle: {
 									outline: 'rgba(255, 255, 255, 0.3) solid 1px',
 									borderRadius: '10px',
@@ -464,7 +293,7 @@
 						>
 							{#each column.items as item (item.id)}
 								<a
-									href={dragDisabled ? item.url : undefined}
+									href={$dragDisabled ? item.url : undefined}
 									class="bg-newtab p-2 px-2 select-none rounded-[10px] border border-[#545454] text-[#fdf6e3]
 						hover:bg-[#2c2c2c] hover:border-[#c1f4ff] hover:text-[#c1f4ff]
 						font-Bitter text-[18px] flex items-center transition-colors duration-75 min-h-[45px]"
@@ -476,7 +305,7 @@
 									<div class="text-clip">
 										{item.text}
 									</div>
-									{#if !dragDisabled}
+									{#if !$dragDisabled}
 										<button
 											transition:fade={{ duration: 100 }}
 											class="ml-auto rounded-full bg-transparent"
