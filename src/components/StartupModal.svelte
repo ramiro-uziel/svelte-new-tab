@@ -7,7 +7,6 @@
 	import StartupAbout from './Settings/StartupAbout.svelte';
 	import StartupFileLayout from './Settings/StartupFileLayout.svelte';
 	import Donate from './Settings/DonateStartup.svelte';
-	import Placeholder from './Settings/Placeholder.svelte';
 
 	let parent: Element;
 	let enabled = true;

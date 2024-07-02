@@ -48,7 +48,9 @@
 	});
 
 	let fuseOptions = {
-		keys: ['text', 'url']
+		keys: ['text', 'url'],
+		threshold: 0.3,
+		minMatchCharLength: 1
 	};
 	let query = '';
 	let result: ResultType<UrlItem> = [];
@@ -79,7 +81,7 @@
 				window.location.href = googleUrl;
 			} else if (result.length > 0) {
 				window.location.href = result[selectedIndex].item.url;
-			} else {
+			} else if (!query.startsWith('ch ') && !query.startsWith('g ')) {
 				const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
 				window.location.href = googleUrl;
 			}
@@ -161,7 +163,8 @@
 							</li>
 						</ul>
 					{/if}
-					{#if query.startsWith('g ') || (query.length > 0 && result.length === 0)}
+					<!-- {#if query.startsWith('g ')} -->
+					{#if query.startsWith('g ') || (!query.startsWith('ch') && query.length > 0 && result.length === 0)}
 						<ul class="overflow-y-auto max-h-[calc(100vh-150px)]">
 							<li class="mt-2 p-3 bg-black bg-opacity-40 rounded-md list-item items-center">
 								<i class="fa-brands fa-google icon"></i>

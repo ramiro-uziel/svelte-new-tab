@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { hexToHSL, HSLToHex } from '$lib/utils/color';
+	// import Knob from './Knob.svelte';
+	import Knob from './Knob/Knob.svelte';
 
 	interface Item {
 		id: string;
@@ -23,7 +25,6 @@
 		backupOriginalColor: string;
 	}
 
-	import Knob from './Knob.svelte';
 	let value = 0;
 	let sections: SectionWithBackup[] = [];
 
@@ -110,7 +111,8 @@
 <div class="flex flex-row">
 	<div class="flex flex-col mr-10 gap-2 justify-center items-center">
 		<p class="text-white">Hue</p>
-		<Knob bind:value max={100} min={0} pixelRange={180} />
+		<!-- <Knob bind:value max={100} min={0} pixelRange={180} /> -->
+		<Knob bind:value max={100} min={0} />
 		<div class="flex flex-col gap-3 mt-3">
 			<button on:click={saveColors}>
 				<i
@@ -125,7 +127,7 @@
 		</div>
 	</div>
 	<div
-		class="grid grid-cols-3 gap-4 flex-1 h-[200px] max-h-[200px] overflow-auto  overflow-x-hidden"
+		class="grid grid-cols-3 gap-4 flex-1 h-[200px] max-h-[200px] overflow-auto overflow-x-hidden"
 	>
 		{#each sections as section}
 			<div
